@@ -3,11 +3,27 @@ import InputBox from './components/InputBox'
 import Button from './components/Button'
 import { useState } from 'react'
 import axios from 'axios';
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts'
 
 
 function App() {
   const [nums,setNums]=useState([]);
   const [result, setResult] = useState(null);
+  const chartData = nums
+    .filter((value) => Number.isFinite(value))
+    .map((value, index) => ({
+      point: index + 1,
+      value,
+    }))
+
   const getdetails=async()=>{
    //api call
    try {
@@ -38,6 +54,33 @@ function App() {
         </p>
         <InputBox setNums={setNums}/>
         <Button onClick={getdetails} />
+
+        {chartData.length > 0 && (
+          <div className="mt-6 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+            <h3 className="text-lg font-semibold text-gray-800">Input Trend Graph</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              Values are plotted in the same order as your input.
+            </p>
+            <div className="mt-4 h-72 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#dbeafe" />
+                  <XAxis dataKey="point" label={{ value: 'Location', position: 'insideBottom', offset: -5 }} />
+                  <YAxis />
+                  <Tooltip />
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke="#4f46e5"
+                    strokeWidth={3}
+                    dot={{ r: 4, strokeWidth: 2 }}
+                    activeDot={{ r: 6 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
 
         {result && (
   <div className="mt-6 rounded-lg bg-gray-100 p-4">
